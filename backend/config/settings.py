@@ -98,12 +98,20 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 os.makedirs(STATIC_ROOT, exist_ok=True)
 os.makedirs(BASE_DIR / 'static', exist_ok=True)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'minio_storage.storage.MinioMediaStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 
 def _parse_csv_env(key: str, fallback: list[str] | None = None) -> list[str]:
@@ -140,8 +148,6 @@ CSRF_TRUSTED_ORIGINS = _parse_csv_env('CSRF_TRUSTED_ORIGINS', [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-DEFAULT_FILE_STORAGE = 'minio_storage.storage.MinioMediaStorage'
-
 MINIO_STORAGE_ENDPOINT = os.getenv('MINIO_STORAGE_ENDPOINT', 'minio:9000')
 MINIO_STORAGE_ACCESS_KEY = os.getenv('MINIO_STORAGE_ACCESS_KEY')
 MINIO_STORAGE_SECRET_KEY = os.getenv('MINIO_STORAGE_SECRET_KEY')
@@ -149,6 +155,12 @@ MINIO_STORAGE_USE_HTTPS = os.getenv('MINIO_STORAGE_USE_HTTPS', 'True') == 'True'
 MINIO_STORAGE_MEDIA_BUCKET_NAME = os.getenv('MINIO_STORAGE_MEDIA_BUCKET_NAME', 'media')
 MINIO_STORAGE_AUTO_CREATE_MEDIA_BUCKET = True
 MINIO_STORAGE_STATIC_BUCKET_NAME = os.getenv('MINIO_STORAGE_STATIC_BUCKET_NAME', 'static')
+
+_minio_scheme = 'https' if MINIO_STORAGE_USE_HTTPS else 'http'
+MINIO_STORAGE_MEDIA_URL = os.getenv(
+    'MINIO_STORAGE_MEDIA_URL',
+    f'{_minio_scheme}://{MINIO_STORAGE_ENDPOINT}/{MINIO_STORAGE_MEDIA_BUCKET_NAME}',
+)
 
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760
