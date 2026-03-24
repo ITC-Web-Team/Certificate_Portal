@@ -1,0 +1,9 @@
+.DS_Store
+.env
+.env.local
+.venv/
+node_modules/
+__pycache__/
+*.pyc
+dist/
+sample.csv
