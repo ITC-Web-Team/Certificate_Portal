@@ -17,7 +17,7 @@ All text rendering is performed server-side with Pillow, ensuring pixel-perfect 
 
 ```
 certificate/
-├── certificate_backend/    # Django API server
+├── backend/    # Django API server
 │   ├── config/
 │   │   ├── models.py       # Certificate & CertificateField models
 │   │   ├── views.py        # REST API endpoints
@@ -26,7 +26,7 @@ certificate/
 │   │   └── urls.py
 │   ├── manage.py
 │   └── requirements.txt
-├── certificate_frontend/   # React SPA
+├── frontend/   # React SPA
 │   ├── src/
 │   │   ├── pages/          # Route-level components
 │   │   ├── components/     # Shared UI components
@@ -48,7 +48,7 @@ certificate/
 ### 1. Backend
 
 ```bash
-cd certificate_backend
+cd backend
 
 python3.11 -m venv .venv
 source .venv/bin/activate
@@ -92,7 +92,7 @@ python manage.py runserver
 ### 2. Frontend
 
 ```bash
-cd certificate_frontend
+cd frontend
 
 npm install
 ```
