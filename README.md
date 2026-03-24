@@ -11,30 +11,8 @@ All text rendering is performed server-side with Pillow, ensuring pixel-perfect 
 | Backend  | Django 5.1, Django REST Framework, PostgreSQL, Pillow, ReportLab |
 | Storage  | MinIO (via django-minio-storage)                                 |
 | Frontend | React 18, TypeScript, Vite 5, Tailwind CSS 3, Radix UI           |
-| Auth     | IIT Bombay SSO                                                   |
+| Auth     | [ITC SSO](https://sso.tech-iitb.org)                                                   |
 
-## Project Structure
-
-```
-certificate/
-├── backend/    # Django API server
-│   ├── config/
-│   │   ├── models.py       # Certificate & CertificateField models
-│   │   ├── views.py        # REST API endpoints
-│   │   ├── rendering.py    # Pillow-based image generation
-│   │   ├── serializers.py
-│   │   └── urls.py
-│   ├── manage.py
-│   └── requirements.txt
-├── frontend/   # React SPA
-│   ├── src/
-│   │   ├── pages/          # Route-level components
-│   │   ├── components/     # Shared UI components
-│   │   ├── hooks/          # Custom React hooks
-│   │   └── lib/            # API client, SSO, CSV validation
-│   └── package.json
-└── README.md
-```
 
 ## Prerequisites
 

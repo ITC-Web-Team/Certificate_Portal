@@ -38,9 +38,9 @@ export default function Layout() {
           <div className="flex items-center gap-4">
             <Link to="/my-certificates" className="flex items-center gap-2.5">
               <img src="/img/logo.png" alt="Logo" className="h-9 w-9 rounded-lg border border-primary/20" />
-              <div className="hidden sm:block">
-                <p className="text-sm font-semibold text-foreground">Certificate Portal</p>
-                <p className="text-xs text-muted-foreground">ITC Web Team</p>
+              <div className="hidden leading-tight sm:block">
+                <p className="text-sm font-semibold text-foreground">Certificate</p>
+                <p className="text-xs font-medium text-muted-foreground">Portal</p>
               </div>
             </Link>
             <button
