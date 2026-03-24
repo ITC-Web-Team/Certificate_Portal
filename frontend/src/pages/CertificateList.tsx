@@ -62,17 +62,15 @@ export default function CertificateList() {
         subtitle="Browse all verified certificate templates. Click to check if you have one."
       />
 
-      <Surface className="mb-6">
-        <div className="relative w-full">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search by certificate title or organization"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="h-11 pl-10"
-          />
-        </div>
-      </Surface>
+      <div className="relative mb-6">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Search by certificate title or organization"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="h-11 pl-10"
+        />
+      </div>
 
       <div className="page-grid">
         {filteredCertificates.map((cert) => (
