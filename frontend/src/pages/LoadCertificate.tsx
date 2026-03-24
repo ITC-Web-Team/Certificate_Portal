@@ -17,6 +17,7 @@ import axios from "axios";
 import { validateCSV } from "@/lib/csvValidator";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { PageHeader, PageShell, Surface } from "@/components/ui/page-shell";
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -239,19 +240,19 @@ export default function LoadCertificate() {
   };
 
   return (
-    <div className="container mx-auto max-w-4xl py-8">
-      <div className="space-y-8">
-        <div>
-          <h1 className="text-2xl font-semibold text-[#101828]">Create New Template</h1>
-          <p className="mt-1 text-[#475467]">Add a new certificate template and configure its variables.</p>
-        </div>
+    <PageShell>
+      <div className="mx-auto max-w-6xl space-y-6">
+        <PageHeader
+          title="Create New Template"
+          subtitle="Upload a certificate design, map CSV columns, and define text variables."
+        />
 
         {step === 1 ? (
-          <form onSubmit={handleFirstStep} className="space-y-6 bg-white p-6 rounded-lg border border-[#E4E7EC] shadow-sm">
+          <form onSubmit={handleFirstStep} className="space-y-6 rounded-2xl border border-border/70 bg-card p-5 shadow-sm sm:p-6">
             <div className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="title" className="text-[#344054]">Certificate Title</Label>
+                  <Label htmlFor="title">Certificate Title</Label>
                   <Input
                     id="title"
                     value={certificateData.title}
@@ -262,7 +263,7 @@ export default function LoadCertificate() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="organization" className="text-[#344054]">Organization Name</Label>
+                  <Label htmlFor="organization">Organization Name</Label>
                   <Input
                     id="organization"
                     value={certificateData.organization}
@@ -276,34 +277,34 @@ export default function LoadCertificate() {
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-[#344054]">Certificate Template</Label>
+                  <Label>Certificate Template</Label>
                   <div className="flex items-center gap-4">
                     <Input
                       type="file"
                       name="template"
                       accept="image/*"
                       onChange={handleFileChange}
-                      className="h-11 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-[#F2F4F7] file:text-[#344054] hover:file:bg-[#E4E7EC]"
+                      className="h-11"
                       required
                     />
                     {previewUrl && (
-                      <img src={previewUrl} alt="Preview" className="h-11 w-auto rounded border border-[#E4E7EC]" />
+                      <img src={previewUrl} alt="Preview" className="h-11 w-auto rounded border border-border/70" />
                     )}
                   </div>
-                  <p className="text-sm text-[#475467]">Upload a PNG or JPG image (max 5MB)</p>
+                  <p className="text-sm text-muted-foreground">Upload a PNG or JPG image (max 5MB)</p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-[#344054]">Data File (CSV)</Label>
+                  <Label>Data File (CSV)</Label>
                   <Input
                     type="file"
                     name="csv"
                     accept=".csv"
                     onChange={handleFileChange}
-                    className="h-11 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-[#F2F4F7] file:text-[#344054] hover:file:bg-[#E4E7EC]"
+                    className="h-11"
                     required
                   />
-                  <p className="text-sm text-[#475467]">Upload a CSV file containing certificate data</p>
+                  <p className="text-sm text-muted-foreground">Upload a CSV file containing certificate data</p>
                 </div>
 
                 {error && (
@@ -316,7 +317,7 @@ export default function LoadCertificate() {
 
                 {csvColumns.length > 0 && (
                   <div className="space-y-2">
-                    <Label className="text-[#344054]">Roll Number Column</Label>
+                    <Label>Roll Number Column</Label>
                     <Select
                       value={certificateData.rollColumn}
                       onValueChange={(value: string) => setCertificateData({ ...certificateData, rollColumn: value })}
@@ -330,13 +331,13 @@ export default function LoadCertificate() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <p className="text-sm text-[#475467]">Select the column containing roll numbers</p>
+                    <p className="text-sm text-muted-foreground">Select the column containing roll numbers</p>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="flex justify-end pt-4 border-t border-[#E4E7EC]">
+            <div className="flex justify-end border-t border-border/70 pt-4">
               <Button
                 type="submit"
                 disabled={!certificateData.template || !certificateData.csvFile || !certificateData.rollColumn}
@@ -348,13 +349,12 @@ export default function LoadCertificate() {
           </form>
         ) : (
           <div className="space-y-6">
-            {/* Preview */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
+            <Surface className="space-y-4">
+              <div className="mb-1 flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-semibold">Preview</h2>
+                  <h2 className="text-xl font-semibold text-foreground">Preview</h2>
                   {templateDims && (
-                    <p className="text-sm text-[#475467]">
+                    <p className="text-sm text-muted-foreground">
                       Template: {templateDims.w} &times; {templateDims.h} px &mdash; coordinates are the center of each text field.
                     </p>
                   )}
@@ -368,20 +368,20 @@ export default function LoadCertificate() {
                   {previewLoading ? "Rendering..." : "Refresh Preview"}
                 </Button>
               </div>
-              <div className="border rounded-lg p-4 bg-gray-50">
+              <div className="rounded-xl border border-border/70 bg-muted/20 p-4">
                 {previewImageUrl ? (
                   <img
                     src={previewImageUrl}
                     alt="Certificate preview"
-                    className="w-full h-auto max-w-[800px] mx-auto rounded-lg"
+                    className="mx-auto h-auto w-full max-w-[900px] rounded-lg"
                   />
                 ) : previewLoading ? (
-                  <p className="text-center text-[#475467] py-12">Rendering preview...</p>
+                  <p className="py-12 text-center text-muted-foreground">Rendering preview...</p>
                 ) : (
-                  <p className="text-center text-[#475467] py-12">Loading template...</p>
+                  <p className="py-12 text-center text-muted-foreground">Loading template...</p>
                 )}
               </div>
-            </div>
+            </Surface>
 
             {error && (
               <Alert variant="destructive">
@@ -391,9 +391,8 @@ export default function LoadCertificate() {
               </Alert>
             )}
 
-            {/* Variables table */}
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Variables</h2>
+            <Surface className="space-y-4">
+              <h2 className="text-xl font-semibold text-foreground">Variables</h2>
               <div className="space-y-4">
                 <Table>
                   <TableHeader>
@@ -557,7 +556,7 @@ export default function LoadCertificate() {
                   </TableBody>
                 </Table>
               </div>
-            </div>
+            </Surface>
 
             <div className="flex justify-end space-x-4">
               <Button type="button" variant="outline" onClick={() => setStep(1)}>
@@ -570,6 +569,6 @@ export default function LoadCertificate() {
           </div>
         )}
       </div>
-    </div>
+    </PageShell>
   );
 }

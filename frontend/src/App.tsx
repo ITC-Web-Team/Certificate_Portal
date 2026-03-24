@@ -18,7 +18,6 @@ function App() {
       <Route path="/auth/redirect" element={<AuthRedirect />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/auth/error" element={<ErrorCallback />} />
-      {/* Protected routes with Layout */}
       <Route element={<Layout />}>
         <Route path="/certificates" element={<CertificateList />} />
         <Route path="/load" element={<LoadCertificate />} />

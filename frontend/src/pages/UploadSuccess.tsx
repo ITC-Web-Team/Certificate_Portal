@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import { CheckCircle2 } from "lucide-react";
+import { PageHeader, PageShell, Surface } from "@/components/ui/page-shell";
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -24,7 +26,11 @@ export default function UploadSuccess() {
   }, [id]);
 
   if (loading) {
-    return <div className="container mx-auto py-8">Loading preview...</div>;
+    return (
+      <PageShell>
+        <Surface className="text-center text-muted-foreground">Loading preview...</Surface>
+      </PageShell>
+    );
   }
 
   const previewSrc = preview
@@ -32,49 +38,39 @@ export default function UploadSuccess() {
     : "";
 
   return (
-    <div className="container mx-auto max-w-4xl py-8">
-      <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8">
-        <div className="flex">
-          <div className="flex-shrink-0">
-            <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-          <div className="ml-3">
-            <h3 className="text-sm font-medium text-yellow-800">Certificate Uploaded Successfully</h3>
-            <div className="mt-2 text-sm text-yellow-700">
-              <p>
-                Your certificate template for{" "}
-                <span className="font-medium">{preview?.organization}</span> has been uploaded and is
-                pending verification.
-              </p>
+    <PageShell>
+      <div className="mx-auto max-w-5xl space-y-6">
+        <PageHeader
+          title="Template Uploaded"
+          subtitle="Your template is now available for verification and certificate generation."
+        />
+
+        <Surface className="border-emerald-200 bg-emerald-50/70">
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-600" />
+            <div className="text-sm text-emerald-800">
+              Your certificate template for <span className="font-semibold">{preview?.organization}</span> has been uploaded successfully and is pending verification.
             </div>
           </div>
-        </div>
-      </div>
+        </Surface>
 
-      {previewSrc && (
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold">Preview (First Entry)</h2>
-          <div className="border rounded-lg p-4">
+        {previewSrc && (
+          <Surface className="space-y-4 p-4">
+            <h2 className="text-lg font-semibold text-foreground">Preview (First CSV Entry)</h2>
             <img
               src={previewSrc}
               alt="Certificate preview"
-              className="w-full h-auto max-w-[800px] mx-auto rounded-lg"
+              className="mx-auto h-auto w-full max-w-[900px] rounded-lg"
             />
-          </div>
-        </div>
-      )}
+          </Surface>
+        )}
 
-      <div className="flex justify-end space-x-4 mt-8">
-        <Link to="/certificates">
-          <Button variant="outline">View All Certificates</Button>
-        </Link>
+        <div className="flex justify-end">
+          <Link to="/certificates">
+            <Button variant="outline">View All Certificates</Button>
+          </Link>
+        </div>
       </div>
-    </div>
+    </PageShell>
   );
 }

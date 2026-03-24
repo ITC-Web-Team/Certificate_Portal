@@ -10,7 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Search } from "lucide-react";
+import { Search, Plus } from "lucide-react";
+import { PageHeader, PageShell, Surface } from "@/components/ui/page-shell";
 
 interface Certificate {
   id: number;
@@ -40,71 +41,82 @@ export default function CertificateList() {
     fetchCertificates();
   }, []);
 
-  // Filter certificates based on search term
   const filteredCertificates = certificates.filter(cert => 
     cert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     cert.organization.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
-    return <div className="container mx-auto py-8">Loading...</div>;
+    return (
+      <PageShell>
+        <Surface className="text-center text-muted-foreground">Loading certificates...</Surface>
+      </PageShell>
+    );
   }
 
   return (
-    <div className="w-full mx-auto">
-      {/* Search bar */}
-      <div className="relative mb-6 w-full mx-auto">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
-        <Input
-          placeholder="Search certificates by title or organization..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 w-full"
-        />
-      </div>
+    <PageShell>
+      <PageHeader
+        title="Certificates"
+        subtitle="Browse issued certificates and open recipient-specific certificate views."
+        action={
+          <Link to="/load">
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              Create Template
+            </Button>
+          </Link>
+        }
+      />
 
-      {/* Certificate grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <Surface className="mb-6">
+        <div className="relative w-full">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search by certificate title or organization"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="h-11 pl-10"
+          />
+        </div>
+      </Surface>
+
+      <div className="page-grid">
         {filteredCertificates.map((cert) => (
-          <Card key={cert.id} className="flex flex-col">
-            <CardHeader className="p-4 pb-0">
+          <Card key={cert.id} className="flex flex-col overflow-hidden">
+            <CardHeader className="space-y-1 pb-0">
               <CardTitle className="text-base truncate">{cert.title}</CardTitle>
-              <p className="text-xs text-muted-foreground truncate">
-                {cert.organization}
-              </p>
+              <p className="truncate text-xs text-muted-foreground">{cert.organization}</p>
             </CardHeader>
-            <CardContent className="p-4">
-              <img 
-                src={`${cert.template}`} 
+            <CardContent>
+              <img
+                src={`${cert.template}`}
                 alt={cert.title}
-                className="w-full h-36 object-cover rounded-md"
+                className="h-40 w-full rounded-xl border border-border/70 object-cover"
               />
             </CardContent>
-            <CardFooter className="p-4 pt-0">
+            <CardFooter>
               <Link to={`/certificates/${cert.id}`} className="w-full">
-                <Button className="w-full">
-                  View Certificate
-                </Button>
+                <Button className="w-full">View Certificate</Button>
               </Link>
             </CardFooter>
           </Card>
         ))}
       </div>
 
-      {/* Empty state */}
       {filteredCertificates.length === 0 && (
-        <div className="text-center py-8">
+        <Surface className="mt-6 text-center">
           {searchTerm ? (
-            <div className="text-gray-500">
+            <div className="text-muted-foreground">
               No certificates found matching "{searchTerm}"
             </div>
           ) : (
-            <div className="text-gray-500">
+            <div className="text-muted-foreground">
               No verified certificates found
             </div>
           )}
-        </div>
+        </Surface>
       )}
-    </div>
+    </PageShell>
   );
-} 
+}

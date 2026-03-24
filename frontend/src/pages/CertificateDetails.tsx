@@ -18,11 +18,12 @@ import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, ArrowLeft, Download, FileDown, Image, Share2, Copy, Check } from "lucide-react";
+import { PageHeader, PageShell, Surface } from "@/components/ui/page-shell";
 
 interface CertificateData {
   template: string;
-  organization: string;  // Add this to show in error message
-  title: string;        // Add this to show in error message
+  organization: string;
+  title: string;
   fields: {
     [key: string]: {
       value: string;
@@ -46,24 +47,23 @@ export default function CertificateDetails() {
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [copied, setCopied] = useState(false);
   const verifyLinkRef = useRef<HTMLInputElement>(null);
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   useEffect(() => {
     const checkCertificate = async () => {
       try {
-        const userJson = localStorage.getItem('user');
+        const userJson = localStorage.getItem("user");
         if (!userJson) {
-          localStorage.setItem('user', JSON.stringify({roll: '22b0661'}));
-          navigate('/');
+          localStorage.setItem("user", JSON.stringify({ roll: "22b0661" }));
+          navigate("/");
           return;
-        } 
+        }
 
-        // First fetch certificate info
         const response1 = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/certificate/${id}/info/`);
         setCertificateInfo(response1.data);
 
         const user = JSON.parse(userJson);
-        const rollNumber = user.roll;  
+        const rollNumber = user.roll;
 
         const response2 = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/certificate/${id}/details/${rollNumber}/`
@@ -83,83 +83,67 @@ export default function CertificateDetails() {
     checkCertificate();
   }, [id, navigate]);
 
-  const handleDownloadPDF = async () => {
+  const handleDownload = async (mode: "pdf" | "png", extension: "pdf" | "png") => {
     if (!certificateInfo) return;
-    
+
     setDownloading(true);
     try {
-      const userRoll = JSON.parse(localStorage.getItem('user') || '{}').roll;
+      const userRoll = JSON.parse(localStorage.getItem("user") || "{}").roll;
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/certificate/${id}/generate/${userRoll}/pdf/`,
-        { responseType: 'blob' }
+        `${import.meta.env.VITE_API_BASE_URL}/certificate/${id}/generate/${userRoll}/${mode}/`,
+        { responseType: "blob" }
       );
-      
-      // Create download link
+
       const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.setAttribute('download', `${certificateInfo.title.toLowerCase().replace(/\s+/g, '-')}-certificate.pdf`);
+      link.setAttribute("download", `${certificateInfo.title.toLowerCase().replace(/\s+/g, "-")}-certificate.${extension}`);
       document.body.appendChild(link);
       link.click();
       link.remove();
+      window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error downloading PDF:', error);
+      console.error("Error downloading file:", error);
     } finally {
       setDownloading(false);
     }
   };
 
-  const handleDownloadImage = async () => {
-    if (!certificateInfo) return;
-    
-    setDownloading(true);
-    try {
-      const userRoll = JSON.parse(localStorage.getItem('user') || '{}').roll;
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/certificate/${id}/generate/${userRoll}/png/`,
-        { responseType: 'blob' }
-      );
-      
-      // Create download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `${certificateInfo.title.toLowerCase().replace(/\s+/g, '-')}-certificate.png`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (error) {
-      console.error('Error downloading image:', error);
-    } finally {
-      setDownloading(false);
-    }
-  };
+  const handleDownloadPDF = () => handleDownload("pdf", "pdf");
+  const handleDownloadImage = () => handleDownload("png", "png");
 
   const handleShare = () => {
     setShowShareDialog(true);
   };
 
-  const handleCopy = () => {
-    if (verifyLinkRef.current) {
-      verifyLinkRef.current.select();
-      document.execCommand('copy');
+  const handleCopy = async () => {
+    const link = getVerificationLink();
+    try {
+      await navigator.clipboard.writeText(link);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    } catch {
+      if (verifyLinkRef.current) {
+        verifyLinkRef.current.select();
+        document.execCommand("copy");
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
     }
   };
 
   const getVerificationLink = () => {
     const baseUrl = window.location.origin;
-    const userJson = localStorage.getItem('user');
-    const userRoll = userJson ? JSON.parse(userJson).roll : '';
+    const userJson = localStorage.getItem("user");
+    const userRoll = userJson ? JSON.parse(userJson).roll : "";
     return `${baseUrl}/verify/${id}/${userRoll}`;
   };
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 max-w-4xl">
-        <div className="text-center">Loading your certificate...</div>
-      </div>
+      <PageShell>
+        <Surface className="max-w-4xl text-center text-muted-foreground">Loading your certificate...</Surface>
+      </PageShell>
     );
   }
 
@@ -169,8 +153,8 @@ export default function CertificateDetails() {
     switch (error) {
       case "certificate_not_found":
         return (
-          <div className="text-center space-y-4">
-            <Alert variant="destructive" className="max-w-2xl mx-auto">
+          <Surface className="space-y-4 text-center">
+            <Alert variant="destructive" className="mx-auto max-w-2xl text-left">
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Certificate Not Found</AlertTitle>
               <AlertDescription>
@@ -188,17 +172,19 @@ export default function CertificateDetails() {
                 Back to Certificates
               </Button>
             </Link>
-          </div>
+          </Surface>
         );
       case "fetch_error":
         return (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>
-              An error occurred while fetching your certificate. Please try again later.
-            </AlertDescription>
-          </Alert>
+          <Surface>
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>
+                An error occurred while fetching your certificate. Please try again later.
+              </AlertDescription>
+            </Alert>
+          </Surface>
         );
       default:
         return null;
@@ -206,50 +192,50 @@ export default function CertificateDetails() {
   };
 
   return (
-    <div className="container mx-auto py-8 max-w-4xl">
-      <div className="space-y-6">
+    <PageShell>
+      <div className="mx-auto max-w-5xl space-y-6">
         {error ? (
           renderError()
         ) : certificateData && (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">Your Certificate</h2>
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  onClick={handleShare}
-                >
-                  <Share2 className="mr-2 h-4 w-4" />
-                  Share
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button disabled={downloading}>
-                      <Download className="mr-2 h-4 w-4" />
-                      {downloading ? "Generating..." : "Download"}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={handleDownloadPDF}>
-                      <FileDown className="mr-2 h-4 w-4" />
-                      Download as PDF
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleDownloadImage}>
-                      <Image className="mr-2 h-4 w-4" />
-                      Download as Image
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
-            
-            <div className="border rounded-lg p-4 bg-white">
-              <img 
+          <>
+            <PageHeader
+              title="Your Certificate"
+              subtitle={`${certificateData.title} · ${certificateData.organization}`}
+              action={
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={handleShare}>
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Share
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button disabled={downloading}>
+                        <Download className="mr-2 h-4 w-4" />
+                        {downloading ? "Generating..." : "Download"}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={handleDownloadPDF}>
+                        <FileDown className="mr-2 h-4 w-4" />
+                        Download as PDF
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleDownloadImage}>
+                        <Image className="mr-2 h-4 w-4" />
+                        Download as Image
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              }
+            />
+
+            <Surface className="p-3 sm:p-4">
+              <img
                 src={`${import.meta.env.VITE_API_BASE_URL}/certificate/${id}/generate/${user.roll}/`}
                 alt="Certificate Preview"
-                className="w-full h-auto rounded-lg"
+                className="h-auto w-full rounded-lg"
               />
-            </div>
+            </Surface>
 
             <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
               <DialogContent>
@@ -259,19 +245,19 @@ export default function CertificateDetails() {
                     Anyone with this link can verify your certificate
                   </DialogDescription>
                 </DialogHeader>
-                <div className="flex gap-2 items-center">
+                <div className="flex items-center gap-2">
                   <Input
                     ref={verifyLinkRef}
                     readOnly
                     value={getVerificationLink()}
                   />
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="icon"
                     onClick={handleCopy}
                   >
                     {copied ? (
-                      <Check className="h-4 w-4 text-green-500" />
+                      <Check className="h-4 w-4 text-emerald-600" />
                     ) : (
                       <Copy className="h-4 w-4" />
                     )}
@@ -279,9 +265,9 @@ export default function CertificateDetails() {
                 </div>
               </DialogContent>
             </Dialog>
-          </div>
+          </>
         )}
       </div>
-    </div>
+    </PageShell>
   );
-} 
+}
