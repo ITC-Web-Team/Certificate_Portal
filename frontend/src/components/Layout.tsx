@@ -26,9 +26,9 @@ export default function Layout() {
   const isActive = (path: string) => location.pathname === path;
 
   const navLinks = [
-    { path: "/certificates", label: "Certificates" },
-    { path: "/templates", label: "Templates" },
-    { path: "/load", label: "Create" },
+    { path: "/my-certificates", label: "My Certificates" },
+    { path: "/certificates", label: "All Certificates" },
+    { path: "/templates", label: "Manage Templates" },
   ];
 
   return (
@@ -36,7 +36,7 @@ export default function Layout() {
       <header className="sticky top-0 z-40 border-b border-primary/15 bg-background/95 backdrop-blur">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4">
-            <Link to="/certificates" className="flex items-center gap-2.5">
+            <Link to="/my-certificates" className="flex items-center gap-2.5">
               <img src="/img/logo.png" alt="Logo" className="h-9 w-9 rounded-lg border border-primary/20" />
               <div className="hidden sm:block">
                 <p className="text-sm font-semibold text-foreground">Certificate Portal</p>

@@ -10,8 +10,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Search, Plus } from "lucide-react";
+import { Search } from "lucide-react";
 import { PageHeader, PageShell, Surface } from "@/components/ui/page-shell";
+
 
 interface Certificate {
   id: number;
@@ -57,16 +58,8 @@ export default function CertificateList() {
   return (
     <PageShell>
       <PageHeader
-        title="Certificates"
-        subtitle="Browse issued certificates and open recipient-specific certificate views."
-        action={
-          <Link to="/load">
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              Create Template
-            </Button>
-          </Link>
-        }
+        title="All Certificates"
+        subtitle="Browse all verified certificate templates. Click to check if you have one."
       />
 
       <Surface className="mb-6">

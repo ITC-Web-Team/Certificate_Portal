@@ -80,7 +80,7 @@ export default function LoadCertificate() {
       setCertificateData((prev) => ({ ...prev, user: user.roll }));
     } else {
       localStorage.removeItem("user");
-      navigate("/login");
+      navigate("/");
     }
   }, [navigate]);
 

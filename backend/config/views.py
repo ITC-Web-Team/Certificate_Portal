@@ -238,6 +238,24 @@ def user_templates(request, user):
 
 
 @api_view(['GET'])
+def my_certificates(request, roll_no):
+    results = []
+    for cert in Certificate.objects.filter(verified=True):
+        try:
+            if _find_row(cert, roll_no) is not None:
+                results.append({
+                    'id': cert.id,
+                    'title': cert.title,
+                    'organization': cert.organization,
+                    'template': cert.template.url,
+                    'created_at': cert.created_at,
+                })
+        except Exception:
+            continue
+    return Response(results)
+
+
+@api_view(['GET'])
 def download_csv(request, pk, user):
     try:
         cert = Certificate.objects.get(id=pk, user=user)

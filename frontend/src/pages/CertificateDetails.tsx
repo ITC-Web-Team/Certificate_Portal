@@ -54,7 +54,6 @@ export default function CertificateDetails() {
       try {
         const userJson = localStorage.getItem("user");
         if (!userJson) {
-          localStorage.setItem("user", JSON.stringify({ roll: "22b0661" }));
           navigate("/");
           return;
         }
@@ -62,8 +61,8 @@ export default function CertificateDetails() {
         const response1 = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/certificate/${id}/info/`);
         setCertificateInfo(response1.data);
 
-        const user = JSON.parse(userJson);
-        const rollNumber = user.roll;
+        const currentUser = JSON.parse(userJson);
+        const rollNumber = currentUser.roll;
 
         const response2 = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/certificate/${id}/details/${rollNumber}/`
@@ -166,10 +165,10 @@ export default function CertificateDetails() {
             <p className="text-muted-foreground">
               If you believe this is a mistake, please contact the event organizers.
             </p>
-            <Link to="/certificates">
+            <Link to="/my-certificates">
               <Button variant="outline" className="mt-4">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Certificates
+                Back to My Certificates
               </Button>
             </Link>
           </Surface>

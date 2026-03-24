@@ -21,7 +21,7 @@ export function useSsoReturn() {
         const userData = await fetchSsoUserData(sessionKey);
         if (cancelled) return;
         localStorage.setItem("user", JSON.stringify(userData));
-        navigate("/certificates", { replace: true });
+        navigate("/my-certificates", { replace: true });
       } catch (err) {
         if (cancelled) return;
         setError(ssoErrorMessage(err));

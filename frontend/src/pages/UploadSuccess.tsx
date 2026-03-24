@@ -66,8 +66,8 @@ export default function UploadSuccess() {
         )}
 
         <div className="flex justify-end">
-          <Link to="/certificates">
-            <Button variant="outline">View All Certificates</Button>
+          <Link to="/templates">
+            <Button variant="outline">Back to Templates</Button>
           </Link>
         </div>
       </div>

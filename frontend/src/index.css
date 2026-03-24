@@ -86,7 +86,7 @@
 
 @layer components {
   .app-nav-link {
-    @apply inline-flex items-center rounded-full border border-transparent px-3.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground;
+    @apply inline-flex items-center rounded-full border border-transparent px-3.5 py-2 text-sm font-medium text-muted-foreground transition-all duration-200 ease-in-out hover:text-foreground;
   }
 
   .app-nav-link-active {
