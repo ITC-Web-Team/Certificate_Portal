@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle, Loader2, Eye, Trash2, Download } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2, Eye, Trash2, Pencil } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { PageHeader, PageShell, Surface } from "@/components/ui/page-shell";
+import CsvEditDialog from "@/components/CsvEditDialog";
 
 interface Template {
   id: number;
@@ -40,6 +41,7 @@ export default function Templates() {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
   const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
+  const [editTemplate, setEditTemplate] = useState<Template | null>(null);
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   const fetchTemplates = useCallback(async () => {
@@ -64,27 +66,6 @@ export default function Templates() {
 
   const handlePreview = (template: Template) => {
     setPreviewTemplate(template);
-  };
-
-  const handleDownloadCSV = async (templateId: number, title: string) => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/certificate/${templateId}/csv/${user.roll}/`,
-        { responseType: "blob" }
-      );
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `${title.toLowerCase().replace(/\s+/g, "-")}-data.csv`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Error downloading CSV:", error);
-    }
   };
 
   useEffect(() => {
@@ -165,9 +146,9 @@ export default function Templates() {
                 variant="secondary"
                 size="icon"
                 className="h-10 w-10"
-                onClick={() => handleDownloadCSV(template.id, template.title)}
+                onClick={() => setEditTemplate(template)}
               >
-                <Download className="h-4 w-4" />
+                <Pencil className="h-4 w-4" />
               </Button>
               <Button
                 variant="destructive"
@@ -210,6 +191,16 @@ export default function Templates() {
             </Button>
           </Link>
         </Surface>
+      )}
+
+      {editTemplate && (
+        <CsvEditDialog
+          open={!!editTemplate}
+          onOpenChange={(open) => { if (!open) setEditTemplate(null); }}
+          certificateId={editTemplate.id}
+          certificateTitle={editTemplate.title}
+          userRoll={user.roll}
+        />
       )}
     </PageShell>
   );

@@ -2,10 +2,11 @@ import io
 import json
 
 import pandas as pd
+from django.core.files.base import ContentFile
 from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.http import HttpResponse
 
 from .models import Certificate, CertificateField
@@ -16,6 +17,12 @@ from .rendering import render_certificate, to_png_bytes, to_pdf_bytes
 def _read_csv(certificate):
     with certificate.csv_data.open('rb') as f:
         return pd.read_csv(io.BytesIO(f.read()))
+
+
+def _save_csv(certificate, df):
+    buf = io.BytesIO()
+    df.to_csv(buf, index=False)
+    certificate.csv_data.save(certificate.csv_data.name, ContentFile(buf.getvalue()), save=True)
 
 
 def _find_row(certificate, roll_no):
@@ -253,6 +260,45 @@ def my_certificates(request, roll_no):
         except Exception:
             continue
     return Response(results)
+
+
+@api_view(['GET', 'PUT'])
+@parser_classes([JSONParser])
+def csv_data(request, pk, user):
+    try:
+        cert = Certificate.objects.get(id=pk, user=user)
+    except Certificate.DoesNotExist:
+        return Response({"error": "Certificate not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        df = _read_csv(cert)
+        return Response({
+            'headers': list(df.columns),
+            'rows': df.fillna('').astype(str).values.tolist(),
+        })
+
+    rows = request.data.get('rows', [])
+    headers = request.data.get('headers', [])
+    if not headers or not rows:
+        return Response({"error": "headers and rows are required"}, status=status.HTTP_400_BAD_REQUEST)
+    df = pd.DataFrame(rows, columns=headers)
+    _save_csv(cert, df)
+    return Response({"ok": True})
+
+
+@api_view(['POST'])
+@parser_classes([MultiPartParser, FormParser])
+def csv_replace(request, pk, user):
+    try:
+        cert = Certificate.objects.get(id=pk, user=user)
+    except Certificate.DoesNotExist:
+        return Response({"error": "Certificate not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    csv_file = request.FILES.get('csv_file')
+    if not csv_file:
+        return Response({"error": "csv_file is required"}, status=status.HTTP_400_BAD_REQUEST)
+    cert.csv_data.save(csv_file.name, csv_file, save=True)
+    return Response({"ok": True})
 
 
 @api_view(['GET'])
